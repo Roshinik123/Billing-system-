@@ -1,0 +1,95 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_ITEMS 100
+#define MAX_NAME_LENGTH 50
+
+typedef struct {
+    char name[MAX_NAME_LENGTH];
+    int quantity;
+    float price;
+} Item;
+
+typedef struct {
+    char customerName[MAX_NAME_LENGTH];
+    Item items[MAX_ITEMS];
+    int itemCount;
+} Bill;
+
+void addItem(Item *item) {
+    printf("Enter item name: ");
+    scanf("%s", item->name);
+    printf("Enter item quantity: ");
+    scanf("%d", &item->quantity);
+    printf("Enter item price: ");
+    scanf("%f", &item->price);
+}
+
+void printBill(Bill *bill) {
+    float total = 0;
+    printf("\nBill for %s:\n", bill->customerName);
+    printf("-------------------------------------------------\n");
+    printf("| %-20s | %-10s | %-10s |\n", "Item Name", "Quantity", "Price");
+    printf("-------------------------------------------------\n");
+    for (int i = 0; i < bill->itemCount; i++) {
+        printf("| %-20s | %-10d | %-10.2f |\n", bill->items[i].name, bill->items[i].quantity, bill->items[i].price);
+        total += bill->items[i].quantity * bill->items[i].price;
+    }
+    printf("-------------------------------------------------\n");
+    printf("Total Amount: %.2f\n", total);
+}
+
+int main() {
+    Bill bills[MAX_ITEMS];
+    int billCount = 0;
+    int choice;
+
+    while (1) {
+        printf("\nBilling System Menu:\n");
+        printf("1. Add New Bill\n");
+        printf("2. Print All Bills\n");
+        printf("3. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                if (billCount >= MAX_ITEMS) {
+                    printf("Cannot add more bills. Maximum limit reached.\n");
+                    break;
+                }
+
+                printf("Enter customer name: ");
+                scanf("%s", bills[billCount].customerName);
+                bills[billCount].itemCount = 0;
+
+                int addItemChoice;
+                do {
+                    if (bills[billCount].itemCount >= MAX_ITEMS) {
+                        printf("Cannot add more items. Maximum limit reached.\n");
+                        break;
+                    }
+                    addItem(&bills[billCount].items[bills[billCount].itemCount]);
+                    bills[billCount].itemCount++;
+
+                    printf("Do you want to add another item? (1 for Yes, 0 for No): ");
+                    scanf("%d", &addItemChoice);
+                } while (addItemChoice != 0);
+
+                billCount++;
+                break;
+            case 2:
+                for (int i = 0; i < billCount; i++) {
+                    printBill(&bills[i]);
+                }
+                break;
+            case 3:
+                exit(0);
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
